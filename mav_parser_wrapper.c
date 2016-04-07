@@ -18,7 +18,7 @@
   *   in the Simulink Coder User's Manual in the Chapter titled,
   *   "Wrapper S-functions".
   *
-  *   Created: Wed Apr  6 22:04:40 2016
+  *   Created: Thu Apr  7 17:20:03 2016
   */
 
 
@@ -36,7 +36,7 @@
 /* %%%-SFUNWIZ_wrapper_includes_Changes_BEGIN --- EDIT HERE TO _END */
 #include "mavlink.h"
 /* %%%-SFUNWIZ_wrapper_includes_Changes_END --- EDIT HERE TO _BEGIN */
-#define u_width 64
+#define u_width 256
 #define y_width 1
 /*
  * Create external references here.  
@@ -52,28 +52,40 @@
  */
 void mav_parser_Outputs_wrapper(const uint8_T *uart_byte,
                           const real_T *uart_status,
-                          int16_T *xacc,
-                          int16_T *yacc,
-                          int16_T *zacc)
+                          int16_T *acc,
+                          real_T *acc_en,
+                          real_T *temp,
+                          real_T *temp_en)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
 static mavlink_message_t msg;
 static mavlink_status_t mav_status;
- 
+
+acc_en[0] = 0;
+temp_en[0] = 0;
 if (uart_status[0] == 1) {
     int i;
-    for (i = 0; i<64; i++)
+    for (i = 0; i<256; i++)
     {
         if (mavlink_parse_char(0, uart_byte[i], &msg, &mav_status))
         {
             switch(msg.msgid)
             {
                 case MAVLINK_MSG_ID_SCALED_IMU:
-                    xacc[0] = mavlink_msg_scaled_imu_get_xacc(&msg);
-                    yacc[0] = mavlink_msg_scaled_imu_get_yacc(&msg);
-                    zacc[0] = mavlink_msg_scaled_imu_get_zacc(&msg);
-                break;
- 
+                {
+                    acc[0] = mavlink_msg_scaled_imu_get_xacc(&msg);
+                    acc[1] = mavlink_msg_scaled_imu_get_yacc(&msg);
+                    acc[2] = mavlink_msg_scaled_imu_get_zacc(&msg);
+                    acc_en[0] = 1;
+                    break;
+                }
+                case MAVLINK_MSG_ID_DEBUG:
+                    if (mavlink_msg_debug_get_ind(&msg)==43)
+                    {
+                        temp[0] = mavlink_msg_debug_get_value(&msg);
+                        temp_en[0] = 1;
+                        break;
+                    }
             }
         }
     }
