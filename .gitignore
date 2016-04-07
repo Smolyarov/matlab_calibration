@@ -1,0 +1,6 @@
+*
+!*.c
+!*.mdl
+!*.m
+mav_parser.c
+!.gitignore
