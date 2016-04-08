@@ -18,7 +18,7 @@
   *   in the Simulink Coder User's Manual in the Chapter titled,
   *   "Wrapper S-functions".
   *
-  *   Created: Thu Apr  7 17:20:03 2016
+  *   Created: Fri Apr  8 17:38:57 2016
   */
 
 
@@ -53,16 +53,15 @@
 void mav_parser_Outputs_wrapper(const uint8_T *uart_byte,
                           const real_T *uart_status,
                           int16_T *acc,
-                          real_T *acc_en,
+                          real_T *imu_en,
                           real_T *temp,
-                          real_T *temp_en)
+                          int16_T *gyro)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
 static mavlink_message_t msg;
 static mavlink_status_t mav_status;
 
-acc_en[0] = 0;
-temp_en[0] = 0;
+imu_en[0] = 0;
 if (uart_status[0] == 1) {
     int i;
     for (i = 0; i<256; i++)
@@ -76,14 +75,16 @@ if (uart_status[0] == 1) {
                     acc[0] = mavlink_msg_scaled_imu_get_xacc(&msg);
                     acc[1] = mavlink_msg_scaled_imu_get_yacc(&msg);
                     acc[2] = mavlink_msg_scaled_imu_get_zacc(&msg);
-                    acc_en[0] = 1;
+                    gyro[0] = mavlink_msg_scaled_imu_get_xgyro(&msg);
+                    gyro[1] = mavlink_msg_scaled_imu_get_ygyro(&msg);
+                    gyro[2] = mavlink_msg_scaled_imu_get_zgyro(&msg);
+                    imu_en[0] = 1;
                     break;
                 }
                 case MAVLINK_MSG_ID_DEBUG:
                     if (mavlink_msg_debug_get_ind(&msg)==43)
                     {
                         temp[0] = mavlink_msg_debug_get_value(&msg);
-                        temp_en[0] = 1;
                         break;
                     }
             }

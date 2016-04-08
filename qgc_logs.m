@@ -69,5 +69,31 @@ for i = 1:3
     Pbias(i,:) = polyfit(temp,BIAS(:,i),3);
     Pscale(i,:) = polyfit(temp,WINV(:,i),3);
 end
-Pbias
+%accel
+Pbias 
 Pscale
+
+%% gyro (bias only)
+load('gyro.mat');
+clear prep_data
+log_data = [double(gyro) round(temp)];
+
+cnt = 0;
+    for t = temp_lo:temp_hi
+        log_part = log_data(log_data(:,4)==t,:); % measurements with equal temperature
+        if (~isempty(log_part))
+            cnt = cnt + 1;
+            meas_avg = mean(log_part,1);
+            prep_data(cnt,1) = meas_avg(1);
+            prep_data(cnt,2) = meas_avg(2);
+            prep_data(cnt,3) = meas_avg(3);
+            prep_data(cnt,4) = meas_avg(4);
+        end
+    end
+BIAS_gyro = prep_data(:,1:3);
+
+temp = (temp_lo:temp_hi)';
+for i = 1:3
+    Pbias_gyro(i,:) = polyfit(temp,BIAS_gyro(:,i),3);
+end
+Pbias_gyro
