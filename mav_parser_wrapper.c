@@ -18,7 +18,7 @@
   *   in the Simulink Coder User's Manual in the Chapter titled,
   *   "Wrapper S-functions".
   *
-  *   Created: Fri Apr  8 17:38:57 2016
+  *   Created: Mon Apr 11 19:11:27 2016
   */
 
 
@@ -82,7 +82,7 @@ if (uart_status[0] == 1) {
                     break;
                 }
                 case MAVLINK_MSG_ID_DEBUG:
-                    if (mavlink_msg_debug_get_ind(&msg)==43)
+                    if (mavlink_msg_debug_get_ind(&msg)==1)
                     {
                         temp[0] = mavlink_msg_debug_get_value(&msg);
                         break;
