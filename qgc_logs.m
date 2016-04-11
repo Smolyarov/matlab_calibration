@@ -4,7 +4,7 @@ clc
 
 num_logfiles = 6;
 B_mag = 500;
-B_acc = 9810;
+B_acc = 9.81;
 B_gyr = 0;
 temp_base = 30; % celsius
 temp_lo = 36;
@@ -14,7 +14,7 @@ cnt = 0;
 for i = 1:num_logfiles
     load(strcat(int2str(i),'.mat'));
     disp(strcat(int2str(i),'.mat'));
-    log_data = [double(acc) round(temp)];
+    log_data = [double(acc)./1000 round(temp)];
     
     for t = temp_lo:temp_hi
         log_part = log_data(log_data(:,4)==t,:); % measurements with equal temperature
@@ -76,7 +76,7 @@ Pscale
 %% gyro (bias only)
 load('gyro.mat');
 clear prep_data
-log_data = [double(gyro) round(temp)];
+log_data = [double(gyro)./1000 round(temp)];
 
 cnt = 0;
     for t = temp_lo:temp_hi
