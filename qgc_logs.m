@@ -9,6 +9,7 @@ B_gyr = 0;
 temp_base = 30; % celsius
 temp_lo = 36;
 temp_hi = 61;
+fit_order = 1;
 
 cnt = 0;
 for i = 1:num_logfiles
@@ -66,8 +67,8 @@ for t = temp_lo:temp_hi
 end
 temp = (temp_lo:temp_hi)';
 for i = 1:3
-    Pbias(i,:) = polyfit(temp,BIAS(:,i),3);
-    Pscale(i,:) = polyfit(temp,WINV(:,i),3);
+    Pbias(i,:) = polyfit(temp,BIAS(:,i),fit_order);
+    Pscale(i,:) = polyfit(temp,WINV(:,i),fit_order);
 end
 %accel
 Pbias 
@@ -94,6 +95,19 @@ BIAS_gyro = prep_data(:,1:3);
 
 temp = (temp_lo:temp_hi)';
 for i = 1:3
-    Pbias_gyro(i,:) = polyfit(temp,BIAS_gyro(:,i),3);
+    Pbias_gyro(i,:) = polyfit(temp,BIAS_gyro(:,i),fit_order);
 end
 Pbias_gyro
+
+temp = 36:61;
+for i = 1:3
+    acc_bias(:,i) = polyval(Pbias(i,:),temp);
+    gyro_bias(:,i) = polyval(Pbias_gyro(i,:),temp);
+end
+figure
+subplot 231; plot(temp,BIAS);title('acc actual');
+subplot 234; plot(temp,BIAS_gyro);title('gyro actual');
+subplot 232; plot(temp,acc_bias);title('acc estimate');
+subplot 235; plot(temp,gyro_bias);title('gyro estimate');
+subplot 233; plot(temp,abs(BIAS-acc_bias));title('err');
+subplot 236; plot(temp,abs(BIAS_gyro-gyro_bias));title('err');
